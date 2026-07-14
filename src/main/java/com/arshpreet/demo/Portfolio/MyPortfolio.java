@@ -20,7 +20,7 @@ public class MyPortfolio {
     @GetMapping("/skills")
     public String skills(){
         return """
-                <h1>Skills>/h1>
+                <h1>Skills</h1>
                 <p>Languages</p>
                 <ul>
                 <li>C++</li>

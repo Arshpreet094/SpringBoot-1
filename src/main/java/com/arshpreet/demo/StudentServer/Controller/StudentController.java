@@ -27,9 +27,34 @@ public class StudentController {
         }
         return ResponseEntity.status(201).body(result);
     }
-    @GetMapping("getStudent/{id}")
+    @GetMapping("/getStudent/{id}")
     public ResponseEntity<?> getStudentById(@PathVariable int id){
+
         Student student = studentService.getStudentById(id);
-        return ResponseEntity.status(200).body(student);
+
+        if(student == null){
+            return ResponseEntity.status(404).body("Student not found");
+        }
+
+        return ResponseEntity.ok(student);
+    }
+
+    @PutMapping("/updateStudent/{id}")
+    public ResponseEntity<?> updateStudent(@PathVariable int id, @RequestBody Student student){
+        Student result = studentService.studentUpdate(id, student);
+        if(result == null)
+        {
+            return ResponseEntity.status(400).body("Invalid input");
+        }
+        return ResponseEntity.status(200).body(result);
+    }
+
+    @DeleteMapping("/deleteStudent/{id}")
+    public ResponseEntity<?> deleteStudent(@PathVariable int id){
+        Student student = studentService.deleteStudent(id);
+        if(student == null) {
+            return ResponseEntity.status(400).body("Invalid input");
+        }
+        return ResponseEntity.status(200).body("Student deleted");
     }
 }

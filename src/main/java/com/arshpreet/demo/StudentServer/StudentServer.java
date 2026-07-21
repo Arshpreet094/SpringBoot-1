@@ -1,31 +1,64 @@
 package com.arshpreet.demo.StudentServer;
+import com.arshpreet.demo.StudentServer.Entity.Student;
+import com.arshpreet.demo.StudentServer.Repository.StudentRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import java.time.LocalDateTime;
 
-@RestController
-public class StudentServer {
+@Service
+public class StudentService {
+    StudentRepository studentRepository;
 
-    //1. Store the student info (Post)
-//    @PostMapping("/create")
-//    public String storeStudent(@RequestBody Student student){
-//
-//        int id = student.getId();
-//        String name = student.getName();
-//        int age = student.getAge();
-//        String department = student.getDepartment();
-//
-//
-//        return " id : " + id +
-//                ", name : " + name +
-//                ",Department : " + department +
-//                ",age : " + age;
-//    }
+    @Autowired
+    public StudentService(StudentRepository studentRepository) {
+        this.studentRepository = studentRepository;
+    }
 
-    //2. Read the student info (Get)
+    public Student studentValidate(Student student) {
 
-    //3. update the student info (Put,Patch)
+        int id = student.getId();
+        String name = student.getName();
+        int age = student.getAge();
+        String department = student.getDepartment();
 
-    //4. delete the student info (Delete)
+        if (id <= 0 || name == null || name.isBlank()
+                || age <= 0 || department == null || department.isBlank()) {
+            return null;
+        }
+
+        student.setCreatedAt(LocalDateTime.now());
+        student.setUpdatedAt(LocalDateTime.now());
+
+        return studentRepository.save(student);
+    }
+
+    public Student getStudentById(int id) {
+        return studentRepository.findById(id).orElse(null);
+    }
+
+    public Student studentUpdate(int id, Student student) {
+
+        Student result = studentRepository.findById(id).orElse(null);
+
+        if (result == null) {
+            return null;
+        }
+
+        result.setName(student.getName());
+        result.setAge(student.getAge());
+        result.setDepartment(student.getDepartment());
+        result.setUpdatedAt(LocalDateTime.now());
+
+        return studentRepository.save(result);
+    }
+
+    public Student deleteStudent(int id) {
+        Student result = studentRepository.findById(id).orElse(null);
+        if(result == null) {
+            return null;
+        }
+        studentRepository.delete(result);
+        return result;
+    }
 }

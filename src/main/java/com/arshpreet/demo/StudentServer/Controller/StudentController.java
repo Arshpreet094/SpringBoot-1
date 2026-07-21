@@ -1,7 +1,12 @@
 package com.arshpreet.demo.StudentServer.Controller;
 
+import com.arshpreet.demo.StudentServer.DTO.CreateStudentResponseDTO;
+import com.arshpreet.demo.StudentServer.DTO.CreateStudentRequestDTO;
+import com.arshpreet.demo.StudentServer.DTO.UpdateStudentRequestDTO;
+import com.arshpreet.demo.StudentServer.DTO.UpdateStudentResponseDTO;
 import com.arshpreet.demo.StudentServer.Entity.Student;
 import com.arshpreet.demo.StudentServer.Service.StudentService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,35 +23,37 @@ public class StudentController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Student> storeStudent(@RequestBody Student student){
+    public ResponseEntity<?> storeStudent(@Valid @RequestBody CreateStudentRequestDTO createStudentRequestDTO) {
+        CreateStudentResponseDTO result = studentService.studentValidate(createStudentRequestDTO);
 
-        Student result = studentService.studentValidate(student);
-
-        if(result == null){
-            return ResponseEntity.status(400).body(result);
+        if(result == null)
+        {
+            return ResponseEntity.status(400).body("Invalid input");
         }
-        return ResponseEntity.status(201).body(result);
+        return  ResponseEntity.status(201).body(result);
     }
+
     @GetMapping("/getStudent/{id}")
-    public ResponseEntity<?> getStudentById(@PathVariable int id){
+    public ResponseEntity<?> getStudentById(@PathVariable int id)  {
 
         Student student = studentService.getStudentById(id);
-
-        if(student == null){
-            return ResponseEntity.status(404).body("Student not found");
-        }
 
         return ResponseEntity.ok(student);
     }
 
     @PutMapping("/updateStudent/{id}")
-    public ResponseEntity<?> updateStudent(@PathVariable int id, @RequestBody Student student){
-        Student result = studentService.studentUpdate(id, student);
-        if(result == null)
-        {
-            return ResponseEntity.status(400).body("Invalid input");
+    public ResponseEntity<?> updateStudent(
+            @PathVariable int id,
+            @RequestBody UpdateStudentRequestDTO updateStudentRequestDTO) {
+
+        UpdateStudentResponseDTO result =
+                studentService.studentUpdate(id, updateStudentRequestDTO);
+
+        if (result == null) {
+            return ResponseEntity.status(404).body("Student not found");
         }
-        return ResponseEntity.status(200).body(result);
+
+        return ResponseEntity.ok(result);
     }
 
     @DeleteMapping("/deleteStudent/{id}")

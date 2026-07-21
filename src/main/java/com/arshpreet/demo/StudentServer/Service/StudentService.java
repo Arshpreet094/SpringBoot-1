@@ -1,12 +1,16 @@
 package com.arshpreet.demo.StudentServer.Service;
 
-
+import com.arshpreet.demo.StudentServer.DTO.CreateStudentResponseDTO;
+import com.arshpreet.demo.StudentServer.DTO.CreateStudentRequestDTO;
+import com.arshpreet.demo.StudentServer.DTO.UpdateStudentRequestDTO;
+import com.arshpreet.demo.StudentServer.DTO.UpdateStudentResponseDTO;
 import com.arshpreet.demo.StudentServer.Entity.Student;
 import com.arshpreet.demo.StudentServer.Repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 public class StudentService {
@@ -17,42 +21,35 @@ public class StudentService {
         this.studentRepository = studentRepository;
     }
 
-    public Student studentValidate(Student student) {
+    public CreateStudentResponseDTO studentValidate(CreateStudentRequestDTO createStudentRequestDTO) {
 
-        int id = student.getId();
-        String name = student.getName();
-        int age = student.getAge();
-        String department = student.getDepartment();
-
-        if (id <= 0 || name == null || name.isBlank()
-                || age <= 0 || department == null || department.isBlank()) {
-            return null;
-        }
-
-        student.setCreatedAt(LocalDateTime.now());
-        student.setUpdatedAt(LocalDateTime.now());
-
-        return studentRepository.save(student);
+        Student student = mapToStudent(createStudentRequestDTO);
+        studentRepository.save(student);
+        return mapToResponseDTO(student);
     }
 
     public Student getStudentById(int id) {
-        return studentRepository.findById(id).orElse(null);
+        Optional<Student> student = studentRepository.findById(id);
+        return student.get();
     }
 
-    public Student studentUpdate(int id, Student student) {
+    public UpdateStudentResponseDTO studentUpdate(
+            int id,
+            UpdateStudentRequestDTO updateStudentRequestDTO) {
 
-        Student result = studentRepository.findById(id).orElse(null);
+        Student student = studentRepository.findById(id).orElse(null);
 
-        if (result == null) {
+        if (student == null) {
             return null;
         }
 
-        result.setName(student.getName());
-        result.setAge(student.getAge());
-        result.setDepartment(student.getDepartment());
-        result.setUpdatedAt(LocalDateTime.now());
+        student.setName(updateStudentRequestDTO.getName());
+        student.setAge(updateStudentRequestDTO.getAge());
+        student.setUpdatedAt(LocalDateTime.now());
 
-        return studentRepository.save(result);
+        studentRepository.save(student);
+
+        return mapToUpdateResponseDTO(student);
     }
 
     public Student deleteStudent(int id) {
@@ -63,4 +60,41 @@ public class StudentService {
         studentRepository.delete(result);
         return result;
     }
+
+    private Student mapToStudent(CreateStudentRequestDTO createStudentRequestDTO) {
+        Student student = new Student();
+
+        student.setName(createStudentRequestDTO.getName());
+        student.setAge(createStudentRequestDTO.getAge());
+        student.setDepartment(createStudentRequestDTO.getDepartment());
+        student.setCreatedAt(LocalDateTime.now());
+        student.setUpdatedAt(LocalDateTime.now());
+
+        return student;
+    }
+
+    private CreateStudentResponseDTO mapToResponseDTO(Student student) {
+        CreateStudentResponseDTO createStudentResponseDTO = new CreateStudentResponseDTO();
+        createStudentResponseDTO.setId(student.getId());
+        createStudentResponseDTO.setName(student.getName());
+        createStudentResponseDTO.setAge(student.getAge());
+        createStudentResponseDTO.setDepartment(student.getDepartment());
+
+        return createStudentResponseDTO;
+
+    }
+
+    private UpdateStudentResponseDTO mapToUpdateResponseDTO(Student student) {
+
+        UpdateStudentResponseDTO dto = new UpdateStudentResponseDTO();
+
+        dto.setId(student.getId());
+        dto.setName(student.getName());
+        dto.setAge(student.getAge());
+        dto.setDepartment(student.getDepartment());
+
+        return dto;
+    }
+
+
 }

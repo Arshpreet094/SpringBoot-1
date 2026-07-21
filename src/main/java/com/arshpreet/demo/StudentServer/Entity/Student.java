@@ -1,4 +1,4 @@
-package com.arshpreet.demo.StudentServer;
+package com.arshpreet.demo.StudentServer.Entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

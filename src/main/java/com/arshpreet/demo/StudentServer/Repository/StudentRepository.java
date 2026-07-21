@@ -1,5 +1,6 @@
-package com.arshpreet.demo.StudentServer;
+package com.arshpreet.demo.StudentServer.Repository;
 
+import com.arshpreet.demo.StudentServer.Entity.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
